@@ -3,6 +3,14 @@
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'CComponent.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'CModule.php';
 
+/**
+ * @property ScriptModule $script
+ * @property EditableModule $editable
+ * @property JqueryModule $jquery
+ * @property DbModule $db
+ * @property DsModule $ds
+ * @property AuthModule $auth
+ */
 class FSMiniApp extends CComponent
 {
     
@@ -102,7 +110,14 @@ class FSMiniApp extends CComponent
         include $filename;
         $content = ob_get_contents();
         ob_end_clean();
+        ob_start();
         include $this->layout;
+        $content = ob_get_contents();
+        ob_end_clean();
+        if ($this->script) {
+            $this->script->make($content);
+        }
+        echo $content;
     }
     
     public function redirect($url=null, $code=302)
@@ -158,6 +173,52 @@ class FSMiniApp extends CComponent
     public function getBasePath($absolute=true)
     {
         return '/';
+    }
+    
+    public function publish($dir)
+    {
+        $name = md5(filemtime($dir) . $dir);
+        $name .= self::$_tstart;
+        $path = $this->basePath . 'assets/' . $name . '/';
+        $adir = $this->webRoot . $path;
+        if (file_exists($adir)) {
+            
+        } else {
+            mkdir($adir, 0770, true);
+            $this->recurseCopy($dir,$adir);
+        }
+        return $path;
+    }
+    
+    function recurseCopy($src,$dst) { 
+        $dir = opendir($src); 
+        @mkdir($dst); 
+        while(false !== ( $file = readdir($dir)) ) { 
+            if (( $file != '.' ) && ( $file != '..' )) { 
+                if ( is_dir($src . '/' . $file) ) { 
+                    $this->recurseCopy($src . '/' . $file,$dst . '/' . $file); 
+                } 
+                else { 
+                    copy($src . '/' . $file,$dst . '/' . $file); 
+                } 
+            } 
+        } 
+        closedir($dir); 
+    }
+    
+    public function getWebRoot()
+    {
+        return dirname(__FILE__) . DIRECTORY_SEPARATOR . '..';
+    }
+    
+    public function registerScriptFile($f, $pos = null, $htmlOptions=array())
+    {
+        $this->script->registerScriptFile($f, $pos, $htmlOptions);
+    }
+    
+    public function registerCssFile($f)
+    {
+        $this->script->registerCssFile($f);
     }
     
 }

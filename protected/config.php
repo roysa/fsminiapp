@@ -2,8 +2,10 @@
 
 return array (
     'modules' => array(
+        'jquery' => true,
+        'script' => true,
         'ds' => true,
-        'auth' => true,
+        'auth' => array('salt' => 'fsminiapp'),
         'db' => false,
         'editable' => true,
         
