@@ -6,22 +6,33 @@ class ScriptModule extends CModule
     private $f_js = array();
     private $f_js_options = array();
     private $f_css = array();
+    private $f_css_options = array();
     private $scripts = array();
     
     public function registerScriptFile($f, $pos = null, $htmlOptions=array())
     {
+        if (in_array($f, $this->f_js)) {
+            return;
+        }
         $this->f_js[] = $f;
         $this->f_js_options[] = $htmlOptions;
     }
     
-    public function registerCssFile($f)
+    public function registerCssFile($f, $htmlOptions=array())
     {
+        if (in_array($f, $this->f_css)) {
+            return;
+        }
         $this->f_css[] = $f;
+        $this->f_js_options[] = $htmlOptions;
     }
     
-    public function registerScript($s)
+    public function registerScript($id, $s, $htmlOptions=array())
     {
-        $this->scripts[] = $s;
+        if (isset($this->scripts[$id])) {
+            return;
+        }
+        $this->scripts[$id] = $s;
     }
     
     public function make(&$html)
