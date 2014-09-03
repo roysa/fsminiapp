@@ -21,7 +21,11 @@ class DsModule extends CModule
     
     public function getStoragePath()
     {
-        return dirname(__FILE__) . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR;
+        $p = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR;
+        if (!file_exists($p)) {
+            mkdir($p, 0700, true);
+        }
+        return $p;
     }
     
 }
