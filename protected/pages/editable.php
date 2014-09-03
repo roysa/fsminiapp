@@ -3,11 +3,8 @@
 $this->layout = 'admin';
 FSMiniApp::app()->editable->edit('#multicolumnElement');
 
-?>
-
-<div id="multicolumnElement" class="aloha-editable aloha-editable-active" contenteditable="true">
-		
-		<p class="p-intro">Call me Ishmael. Some years ago - never mind how long precisely - having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world.</p>
+$def = <<<EOF
+        <p class="p-intro">Call me Ishmael. Some years ago - never mind how long precisely - having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world.</p>
 		
 		<p>It is a way I have of driving off the spleen, and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people's hats off - then, I account it high time to get to sea as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the ship. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the ocean with me.</p>
 	
@@ -22,5 +19,20 @@ FSMiniApp::app()->editable->edit('#multicolumnElement');
 		<p>Once more. Say, you are in the country; in some high land of lakes. Take almost any path you please, and ten to one it carries you down in a dale, and leaves you there by a pool in the stream. There is magic in it. Let the most absent- minded of men be plunged in his deepest reveries - stand that man on his legs, set his feet a-going, and he will infallibly lead you to water, if water there be in all that region. Should you ever be athirst in the great American desert, try this experiment, if your caravan happen to be supplied with a metaphysical professor. Yes, as every one knows, meditation and water are wedded for ever.</p>
 
 		<p>But here is an artist. He desires to paint you the dreamiest, shadiest, quietest, most enchanting bit of romantic landscape in all the valley of the Saco. What is the chief element he employs? There stand his trees, each with a hollow trunk, as if a hermit and a crucifix were within; and here sleeps his meadow, and there sleep his cattle; and up from yonder cottage goes a sleepy smoke. Deep into distant woodlands winds a mazy way, reaching to overlapping spurs of mountains bathed in their hill-side blue. But though the picture lies thus tranced, and though this pine-tree shakes down its sighs like leaves upon this shepherd's head, yet all were vain, unless the shepherd's eye were fixed upon the magic stream before him.</p>
-		
+EOF;
+
+    if (isset($_POST['html'])) {
+        FSMiniApp::app()->ds->set('editable_html', $_POST['html']);
+        die();
+    }
+
+    $html = FSMiniApp::app()->ds->get('editable_html');
+    if (!$html) {
+        $html = $def;
+    }
+
+?>
+
+<div id="multicolumnElement" class="aloha-editable aloha-editable-active" contenteditable="true">
+		<?php echo $html; ?>
 	</div>

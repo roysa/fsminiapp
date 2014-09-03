@@ -10,17 +10,29 @@ class EditableModule extends CModule
         $script = "$(document).ready(function(){ 
             Aloha.ready(function() {
             var el = Aloha.jQuery('{$selector}');
+            var chunkName = '{$selector}';
             el.aloha();
             
             var changePending = false;
 
+            function saveChunk()
+            {
+                $.post(window.location.href, {html: el.html(), name: el.attr('id')}, function(){
+                    if (el.hasClass('changed')) {
+                        el.removeClass('changed');
+                    }
+                });
+            }
+
             function elChanged()
             {
+                if (!el.hasClass('changed'))
+                    el.addClass('changed');
                 if (changePending) {
                     clearTimeout(changePending);
                 }
                 changePending = setTimeout(function(){
-                    console.log('SAVE!');
+                    saveChunk();
                 }, 1300);
             }
 
