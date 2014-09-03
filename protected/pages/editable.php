@@ -1,6 +1,6 @@
 <?php
 
-//$this->layout = 'clear';
+$this->layout = 'admin';
 FSMiniApp::app()->editable->edit('#multicolumnElement');
 
 ?>

@@ -6,6 +6,7 @@ class EditableModule extends CModule
     
     public function edit($selector)
     {
+        FSMiniApp::app()->auth->requireAuth();
         $script = "$(document).ready(function(){ 
             Aloha.ready(function() {
             var el = Aloha.jQuery('{$selector}');

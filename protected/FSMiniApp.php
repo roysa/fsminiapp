@@ -15,8 +15,10 @@ class FSMiniApp extends CComponent
 {
     
     protected $_layout = 'main';
+    protected $_pageTitle = '';
     protected $_modules = array();
     protected static $_tstart = null;
+   
     
     protected static $_instance = null;
     
@@ -69,9 +71,15 @@ class FSMiniApp extends CComponent
                 );
             }
         }
+        if (isset($config['pageTitle'])) {
+            $this->pageTitle = $config['pageTitle'];
+        }
     }
     
-    
+    public function createUrl($page)
+    {
+        return $this->getBasePath() . $page;
+    }
     
     public function run()
     {
@@ -118,6 +126,11 @@ class FSMiniApp extends CComponent
             $this->script->make($content);
         }
         echo $content;
+    }
+    
+    public function encode($str)
+    {
+        return htmlspecialchars($str);
     }
     
     public function redirect($url=null, $code=302)
@@ -219,6 +232,16 @@ class FSMiniApp extends CComponent
     public function registerCssFile($f)
     {
         $this->script->registerCssFile($f);
+    }
+    
+    public function getPageTitle()
+    {
+        return $this->_pageTitle;
+    }
+    
+    public function setPageTitle($pt)
+    {
+        $this->_pageTitle = $pt;
     }
     
 }

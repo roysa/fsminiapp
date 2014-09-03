@@ -12,7 +12,23 @@ class AuthModule extends CModule
             $this->login($login, $password);
             return $this->auth();
         }
-        return ($this->session) ? true : false;
+        return ($this->session === null) ? false : true;
+    }
+    
+    public function requireAuth($return_url = '/login')
+    {
+        if (!$this->auth()) {
+            FSMiniApp::app()->redirect($return_url);
+        }
+    }
+    
+    public function addUser($login, $password)
+    {
+        if (isset($this->_passwd[$login])) {
+            throw new Exception('The login "' . $login . '" already exists');
+        }
+        $this->_passwd[$login] = md5($this->_salt . $password);
+        $this->savePasswd();
     }
     
     private function login($login, $password)
@@ -21,8 +37,10 @@ class AuthModule extends CModule
             return false;
         }
         if ($this->_passwd[$login] === md5($this->_salt . $password)) {
-            session_register('ltime');
-            session_register('data');
+            if (function_exists('session_register')) {
+                session_register('ltime');
+                session_register('data');
+            }
             $_SESSION['ltime'] = time();
             $_SESSION['data'] = array();
             return true;
@@ -42,8 +60,14 @@ class AuthModule extends CModule
     
     public function logout()
     {
-        session_unregister('data');
-        session_unregister('ltime');
+        if (function_exists('session_unregister')) {
+            session_unregister('data');
+            session_unregister('ltime');
+        } else {
+            unset($_SESSION['data']);
+            unset($_SESSION['ltime']);
+        }
+        session_destroy();
     }
     
     public function passwd($login, $password)
@@ -52,6 +76,12 @@ class AuthModule extends CModule
             return false;
         }
         $this->_passwd[$login] = md5($this->_salt . $password);
+        $this->savePasswd();
+    }
+    
+    private function savePasswd()
+    {
+        FSMiniApp::app()->ds->set('auth_passwd', $this->_passwd);
     }
     
     public function init($config)
@@ -61,10 +91,30 @@ class AuthModule extends CModule
         }
         $this->_passwd = FSMiniApp::app()->ds->get('auth_passwd');
         parent::init($config);
+        if (!$this->_passwd) {
+            $this->addUser('admin', 'admin');
+            $this->savePasswd();
+        }
     }
     
     public function setSalt($salt)
     {
         $this->_salt = $salt;
+    }
+    
+    public function getList()
+    {
+        $list = array();
+        foreach ($this->_passwd as $login => $p) $list[] = $login;
+        return $list;
+    }
+    
+    public function delete($login)
+    {
+        if (!key_exists($login, $this->_passwd)) {
+            throw new Exception('Login "' . $login . '" does not exsits');
+        }
+        unset($this->_passwd[$login]);
+        $this->savePasswd();
     }
 }
